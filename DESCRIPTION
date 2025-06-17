@@ -1,7 +1,7 @@
 Package: thamesmix
 Type: Package
 Title: Truncated Harmonic Mean Estimator of the Marginal Likelihood for Mixtures
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: 
     c(person(given = "Martin",
     family = "Metodiev",
