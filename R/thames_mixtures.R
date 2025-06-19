@@ -183,14 +183,14 @@
 #'
 #' @export
 thames_mixtures <- function(logpost,
-    sims,
-    n_samples = NULL,
-    c_opt = NULL,
-    type="simple",
-    seed=NULL,
-    lps=NULL,
-    lps_unif=NULL,
-    max_iters=Inf
+                            sims,
+                            n_samples = NULL,
+                            c_opt = NULL,
+                            type="simple",
+                            seed=NULL,
+                            lps=NULL,
+                            lps_unif=NULL,
+                            max_iters=Inf
 ){
   if(!is.null(n_samples)){
     sims = sims[n_samples,,]
@@ -288,9 +288,8 @@ thames_mixtures <- function(logpost,
 
   num_var_g = dim(sims)[3]
 
-  if(is.null(c_opt)){
-    c_opt <- sqrt(d_par+1)
-  }
+  c_opt <- W_c_volB$c_opt
+
   # calculate SVD of sigma_hat
   sigma_svd = svd(sigma_hat)
 
