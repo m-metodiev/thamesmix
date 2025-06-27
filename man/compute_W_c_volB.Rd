@@ -53,6 +53,7 @@ a named list with the following elements:
          log_cor:    used to compute the volume of B in Metodiev et al.(2025)
          param_test: Monte Carlo sample used to compute the volume of B
          co:         the criterion of overlap for G
+         ellipse:    the ellipsoid, potentially shifted to the sample mode
 }
 \description{
 Determine the function W, radius c and volume of B from Metodiev et al.(2025)

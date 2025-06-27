@@ -20,6 +20,7 @@
 #' @param max_iters   maximum number of shrinkage iterations
 #' @importFrom stats          cov
 #' @importFrom uniformly      runif_in_ellipsoid
+#' @importFrom igraph         graph_from_adjacency_matrix shortest.paths
 #' @return a named list with the following elements:
 #'          perms:      number of permutations that were evaluated
 #'          graph:      the overlap graph for G
@@ -28,6 +29,7 @@
 #'          log_cor:    used to compute the volume of B in Metodiev et al.(2025)
 #'          param_test: Monte Carlo sample used to compute the volume of B
 #'          co:         the criterion of overlap for G
+#'          ellipse:    the ellipsoid, potentially shifted to the sample mode
 #'
 #' @references  Martin Metodiev, Nicholas J. Irons, Marie Perrot-Dockès,
 #' Pierre Latouche, Adrian E. Raftery. "Easily Computed Marginal Likelihoods
@@ -76,6 +78,8 @@ compute_W_c_volB = function(params,
   infinite_thames = FALSE
 
   # decrease radius if it takes too long to compute
+  # This first loop is only to decrease computation time.
+  # It works the same as the first, but does not resample via Monte Carlo.
   while(is.infinite(log_cor) & in_ellipse){
     c_opt = c_opt_old / 2^counter
     counter = counter + 1
@@ -90,9 +94,10 @@ compute_W_c_volB = function(params,
                 params_centered) <=radius^2
     empty_ellipse =  (sum(in_E) == 0)
     log_cor = 0
+
     if(empty_ellipse){
       theta_hat = params[(iters+1):(2*iters),
-                         ][which.max(lps[(iters+1):(2*iters)]),]
+      ][which.max(lps[(iters+1):(2*iters)]),]
       mu_post = theta_hat
       ellipse$theta_hat = theta_hat
       c_opt = sqrt(ncol(params)+1)
@@ -132,9 +137,22 @@ compute_W_c_volB = function(params,
           scaling$non_I_set = scaling$non_I_set[-1]
         }
 
-        if((graph_and_non_I_set$complexity_limit_estim>50000)){
+        # calculate an upper bound on the complexity limit using the graphmat
+        graphmat_dummy = (1-graph_and_non_I_set$graphmat)
+
+        # give all edges in the graph a direction
+        graphmat_dummy[lower.tri(graphmat_dummy,diag = TRUE)] = 0
+
+        # compute upper bound in the same way that we compute it in
+        distgraph = graph_from_adjacency_matrix(graphmat_dummy)
+        igraph::E(distgraph)$weight = -1
+        dis <- (-shortest.paths(distgraph, v=(igraph::V(distgraph)), mode="out"))
+
+        complexity_limit_estim = exp(lfactorial(G) - lfactorial(max(dis)))
+
+        if((complexity_limit_estim>50000)){
           log_cor = -Inf
-          if((c_opt<1e-16)|(counter>max_iters)){
+          if((c_opt<0)|(counter>max_iters)){
             log_cor = 0
             infinite_thames = TRUE
           }
@@ -160,7 +178,7 @@ compute_W_c_volB = function(params,
 
   in_ellipse = TRUE
   # c_opt_old = c_opt
-  center = NULL
+  # center = NULL
   while(is.infinite(log_cor) & in_ellipse){
     c_opt = c_opt_old / 2^counter
     param_test = uniformly::runif_in_ellipsoid(n_simuls, inv_post_var, c_opt) +
@@ -185,10 +203,11 @@ compute_W_c_volB = function(params,
     in_E = rowSums((params_centered %*%
                       sparsediscrim::solve_chol(ellipse$sigma_hat)) *
                      params_centered) <=radius^2
+
     empty_ellipse =  (sum(in_E) == 0)
     if(empty_ellipse){
       theta_hat = params[(iters+1):(2*iters),
-                         ][which.max(lps[(iters+1):(2*iters)]),]
+      ][which.max(lps[(iters+1):(2*iters)]),]
       mu_post = theta_hat
       ellipse$theta_hat = theta_hat
       c_opt = sqrt(ncol(params)+1)
@@ -215,7 +234,7 @@ compute_W_c_volB = function(params,
           }
         }
 
-        graph_and_non_I_set = calc_non_I_set(scaling, G, sims, c_opt)
+        graph_and_non_I_set = calc_non_I_set(scaling, G, sims_test, c_opt)
         scaling$non_I_set = graph_and_non_I_set$non_I_set
         if(c_opt_old == c_opt){
           overlapgraph = overlapgraph(sims)
@@ -228,10 +247,11 @@ compute_W_c_volB = function(params,
           graph_and_non_I_set$complexity_limit_estim = factorial(G)
           scaling$non_I_set = scaling$non_I_set[-1]
         }
-
+        print(c_opt)
+        print(graph_and_non_I_set$complexity_limit_estim)
         if((graph_and_non_I_set$complexity_limit_estim>50000)){
           log_cor = -Inf
-          if((c_opt<1e-16)|(counter>max_iters)){
+          if((c_opt<0)|(counter>max_iters)){
             log_cor = 0
             infinite_thames = TRUE
           }
@@ -299,5 +319,6 @@ compute_W_c_volB = function(params,
               scaling=scaling,
               log_cor=log_cor,
               param_test = param_test,
-              co = co))
+              co = co,
+              ellipse=ellipse))
 }

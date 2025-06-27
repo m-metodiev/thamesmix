@@ -1,20 +1,15 @@
-# thamesmix 0.1.1
+# thamesmix 0.1.2
 
-Second cran submission.
+This patch is set quite early (less than 1 week after the package has been 
+accepted). Unfortunately, the errors found are quite important, which is why I 
+sent the patch so soon.
 
-## New features
+## Patch
+This is a patch. In this version I have removed the following bugs:
 
-* `thames_mixtures()` added which computes an estimate for the reciprocal marginal likelihood
-
-* `overlapgraph()` added which computes the overlap graph and criterion of overlap (co)
-
-* `compute_nobile_identity()` added which estimates the log marginal likelihood
-
-* `alltopsorts_recursion()` added which computes all topological orderings
-
-## Resubmission
-This is a resubmission. In this version I have:
-
-* removed the command par() in all files, vignettes and demos,
-
-* added 3 optional parameters to thames_mixtures.
+  -   the center of the ellipsoid was not calculated correctly in some cases, 
+      leading to it being empty (now it is calculated correctly)
+  -   the permutation problem took longer to solve than it should 
+      (now it is computed more quickly)
+  -   the adjusted radius was not transferred to the thamesmix function, 
+      making the ellipse too large in some cases (now the proper radius is used)

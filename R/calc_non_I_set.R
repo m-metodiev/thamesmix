@@ -99,9 +99,9 @@ calc_non_I_set = function(scaling, G, sims, c_opt){
                                  bvec = rep(0,ncol(Amat)),
                                  meq = ncol(Amat)))
       }
-
       maxnorm_ellipse = 2*solution_of_QP$value * divide_to_stabilize +
         t(mu_post)%*%sigma_post_inverse%*%t(t(mu_post))
+
       graphmat[g1,g2] = 0 + (maxnorm_ellipse <= (c_opt^2))
       graphmat[g2,g1] = 0 + (maxnorm_ellipse <= (c_opt^2))
     }
@@ -131,6 +131,8 @@ calc_non_I_set = function(scaling, G, sims, c_opt){
     }
   }
 
+  # if there is an edge in the graphmat, there can't be an edge in the delta mat
+  delta_mat = delta_mat * (1-graphmat)
   distgraph = graph_from_adjacency_matrix(delta_mat)
   igraph::E(distgraph)$weight = -1
   dis <- (-shortest.paths(distgraph, v=(igraph::V(distgraph)), mode="out"))

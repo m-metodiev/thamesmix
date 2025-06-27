@@ -193,7 +193,7 @@ thames_mixtures <- function(logpost,
                             max_iters=Inf
 ){
   if(!is.null(n_samples)){
-    sims = sims[n_samples,,]
+    sims = sims[1:n_samples,,]
   }
 
   if(is.null(lps)){
@@ -220,9 +220,6 @@ thames_mixtures <- function(logpost,
     c_opt = sqrt(ncol(params)+1)
   )
 
-  theta_hat = ellipse$theta_hat
-  sigma_hat = ellipse$sigma_hat
-  c_opt = ellipse$c_opt
   # define B,c,W and find the volume of B as well as Delta
   if(!is.null(seed)){
     W_c_volB = with_seed(seed=seed,compute_W_c_volB(params,
@@ -247,6 +244,11 @@ thames_mixtures <- function(logpost,
                                 lps_unif,
                                 max_iters)
   }
+
+  ellipse = W_c_volB$ellipse
+  theta_hat = ellipse$theta_hat
+  sigma_hat = ellipse$sigma_hat
+  c_opt = ellipse$c_opt
 
   d_par <- length(ellipse$theta_hat)
 
