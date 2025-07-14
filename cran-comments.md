@@ -5,9 +5,9 @@
 ## Patch
 This is a patch. In this version I have removed the following bugs:
 
-  -   the center of the ellipsoid was not calculated correctly in some cases, 
-      leading to it being empty (now it is calculated correctly)
-  -   the permutation problem took longer to solve than it should 
-      (now it is computed more quickly)
-  -   the adjusted radius was not transferred to the thamesmix function, 
-      making the ellipse too large in some cases (now the proper radius is used)
+  -   removed the dependency on the uniformly R package
+
+
+Note: this patch is very early after the latest patch. 
+This is because I was recently notified that this package would be archived 
+if I was to not remove the dependency.

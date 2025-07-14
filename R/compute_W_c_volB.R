@@ -19,7 +19,6 @@
 #'                    evaluated on a uniform sample on the posterior ellipsoid
 #' @param max_iters   maximum number of shrinkage iterations
 #' @importFrom stats          cov
-#' @importFrom uniformly      runif_in_ellipsoid
 #' @importFrom igraph         graph_from_adjacency_matrix shortest.paths
 #' @return a named list with the following elements:
 #'          perms:      number of permutations that were evaluated
@@ -181,7 +180,7 @@ compute_W_c_volB = function(params,
   # center = NULL
   while(is.infinite(log_cor) & in_ellipse){
     c_opt = c_opt_old / 2^counter
-    param_test = uniformly::runif_in_ellipsoid(n_simuls, inv_post_var, c_opt) +
+    param_test = runif_in_ellipsoid(n_simuls, inv_post_var, c_opt) +
       t(matrix(rep(mu_post,n_simuls),ncol=n_simuls))
     param_test_extended = extend_param(param_test, G)
     sims_test = array(c(param_test_extended),dim=dim(sims))
