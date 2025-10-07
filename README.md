@@ -20,7 +20,7 @@ You can install the development version of regexcite from
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("M-crypto645/thamesmix")
+devtools::install_github("m-metodiev/thamesmix")
 ```
 
 ## Usage
